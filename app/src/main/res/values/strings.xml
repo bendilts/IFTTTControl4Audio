@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">IFTTT Control4 Audio Bridge</string>
+
+    <string name="title_activity_input">InputActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+</resources>
