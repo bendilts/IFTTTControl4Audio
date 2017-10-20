@@ -18,9 +18,18 @@ import java.util.Map;
 
 public class HTTPServer {
     private AudioSystem system;
+    private static HTTPServer instance;
 
-    public HTTPServer(AudioSystem s) {
-        system = s;
+    public static HTTPServer getInstance() {
+        if(instance == null) {
+            instance = new HTTPServer();
+            instance.listen(8080);
+        }
+        return instance;
+    }
+
+    public HTTPServer() {
+        system = AudioSystem.getInstance();
     }
 
     private class ListenTask extends AsyncTask<Integer, Integer, Long> {
@@ -55,6 +64,13 @@ public class HTTPServer {
                                     Integer.parseInt(parts[p + 2])
                             );
                             p += 3;
+                            break;
+                        case "t":
+                            system.radio.tune(
+                                    Integer.parseInt(parts[p]),
+                                    parts[p+1]
+                            );
+                            p += 2;
                             break;
                         case "m":
                             system.receiver.setAudio(
@@ -124,36 +140,50 @@ public class HTTPServer {
 
                         //Read until we find the empty line that separates headers from body
                         String data;
-                        int contentLength = 0;
-                        do {
-                            data = inFromClient.readLine();
-                            String[] parts = data.split(":", 2);
-                            if(parts[0].toLowerCase().trim().equals("content-length")) {
-                                contentLength = Integer.parseInt(parts[1].trim());
-                                Log.i("http", "content-length: " + contentLength);
+
+                        //The HTTP request method/url/version
+                        data = inFromClient.readLine();
+                        Log.i("http", data);
+                        String[] parts = data.split(" ");
+                        String method = parts[0].toUpperCase();
+
+                        if(method.equals("POST")) {
+                            int contentLength = 0;
+                            do {
+                                data = inFromClient.readLine();
+                                parts = data.split(":", 2);
+                                if (parts[0].toLowerCase().trim().equals("content-length")) {
+                                    contentLength = Integer.parseInt(parts[1].trim());
+                                    Log.i("http", "content-length: " + contentLength);
+                                }
+                                Log.i("http", data);
+                            } while (data.length() > 0);
+
+                            //Then read the body.
+                            String command;
+                            if (contentLength > 0) {
+                                char[] buf = new char[contentLength];
+                                inFromClient.read(buf, 0, contentLength);
+                                command = new String(buf);
+                            } else {
+                                command = inFromClient.readLine();
                             }
-                            Log.i("http", "header: "+data);
-                        } while(data.length() > 0);
+                            Log.i("http", "command: " + command);
 
-                        //Then read the body.
-                        String command;
-                        if(contentLength > 0) {
-                            char[] buf = new char[contentLength];
-                            inFromClient.read(buf, 0, contentLength);
-                            command = new String(buf);
-                        } else {
-                            command = inFromClient.readLine();
+                            Log.i("http", "Running command: " + command);
+                            handleCommand(command);
+
+                            String response = "HTTP/1.1 204 No Content\r\n";
+                            outToClient.writeBytes(response);
+                        } else if(method.equals("GET")) {
+                            outToClient.writeBytes("HTTP/1.1 200 OK\r\n");
+                            outToClient.writeBytes("\r\n");
+                            outToClient.writeBytes(AudioSystem.getInstance().serialize());
                         }
-                        Log.i("http", "command: "+command);
-
-                        String response = "HTTP/1.1 204 No Content\n";
-                        outToClient.writeBytes(response);
 
                         connectionSocket.close();
                         Log.i("http", "Connection closed");
 
-                        Log.i("http", "Running command: " + command);
-                        handleCommand(command);
                     } catch(Exception e) {
                         Log.e("http", "Exception accepting/processing incoming connection: "+e.getMessage());
                     }

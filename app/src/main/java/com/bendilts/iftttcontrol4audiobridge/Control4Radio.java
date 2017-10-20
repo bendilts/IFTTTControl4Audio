@@ -24,6 +24,10 @@ public class Control4Radio extends Control4Device {
         currentStations.put(tuner, station);
         String hexStation = String.format("%x", (int)(Float.parseFloat(station)*10));
         String tunerName = tuner == 1 ? "a" : "b";
-        sendToDevice(String.format("c4.mt.t%sfreq 00 %s", tunerName, hexStation));
+
+        //The radio sometimes needs to be convinced to change stations.
+        for(int i = 0; i < 5; i++) {
+            sendToDevice(String.format("c4.mt.t%sfreq 00 %s", tunerName, hexStation));
+        }
     }
 }

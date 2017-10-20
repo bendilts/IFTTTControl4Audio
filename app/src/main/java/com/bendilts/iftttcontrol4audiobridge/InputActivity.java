@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 public class InputActivity extends ScreenSaverableActivity implements Control4Device.DeviceListener {
 
+    CommandExecutor executor = CommandExecutor.getInstance();
     AudioSystem system;
     AudioInput input;
 
@@ -50,7 +51,7 @@ public class InputActivity extends ScreenSaverableActivity implements Control4De
         });
 
         int inputIndex = getIntent().getIntExtra("INPUT_INDEX", 1);
-        system = AudioSystem.instance;
+        system = AudioSystem.getInstance();
         input = system.receiver.getInput(inputIndex);
 
         View inputControls = input.getInputControls(getLayoutInflater());
@@ -117,15 +118,7 @@ public class InputActivity extends ScreenSaverableActivity implements Control4De
 
                     @Override
                     public void onStopTrackingTouch(SeekBar seekBar) {
-                        new AsyncTask<Integer, Integer, Long>() {
-                            @Override
-                            protected Long doInBackground(Integer... params) {
-                                try {
-                                    system.receiver.setAudio(output, input, targetVolume);
-                                } catch(Exception e) {}
-                                return 0L;
-                            }
-                        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                        executor.setAudio(output, input, targetVolume);
                     }
                 });
 

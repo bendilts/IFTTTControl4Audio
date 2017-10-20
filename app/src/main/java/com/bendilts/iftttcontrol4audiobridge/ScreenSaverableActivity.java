@@ -7,14 +7,17 @@ import android.os.Message;
 import android.view.View;
 import android.view.WindowManager;
 
-public class ScreenSaverableActivity extends Activity {
-    public static final long DISCONNECT_TIMEOUT = 60 * 1000;
+import java.util.Timer;
+import java.util.TimerTask;
 
-    private Handler disconnectHandler = new Handler(){
+public class ScreenSaverableActivity extends Activity {
+    public static final long SCREENSAVER_TIMEOUT = 60 * 1000;
+
+    private Handler screenSaverHandler = new Handler(){
         public void handleMessage(Message msg) {}
     };
 
-    private Runnable disconnectCallback = new Runnable() {
+    private Runnable screenSaverCallback = new Runnable() {
         @Override
         public void run() {
             Intent intent = new Intent(ScreenSaverableActivity.this, ScreenSaverActivity.class);
@@ -22,31 +25,59 @@ public class ScreenSaverableActivity extends Activity {
         }
     };
 
-    public void resetDisconnectTimer(){
-        disconnectHandler.removeCallbacks(disconnectCallback);
-        disconnectHandler.postDelayed(disconnectCallback, DISCONNECT_TIMEOUT);
+    public void resetScreenSaverTimer(){
+        screenSaverHandler.removeCallbacks(screenSaverCallback);
+        screenSaverHandler.postDelayed(screenSaverCallback, SCREENSAVER_TIMEOUT);
     }
 
-    public void stopDisconnectTimer(){
-        disconnectHandler.removeCallbacks(disconnectCallback);
+    public void stopScreenSaverTimer(){
+        screenSaverHandler.removeCallbacks(screenSaverCallback);
+    }
+
+
+    //2 seconds after interaction (and on activating the activity), update audio system from master
+    public static final long UPDATE_FROM_MASTER_TIMEOUT = 2 * 1000;
+
+    private Handler ufmHandler = new Handler(){
+        public void handleMessage(Message msg) {}
+    };
+
+    private Runnable ufmCallback = new Runnable() {
+        @Override
+        public void run() {
+            CommandExecutor.getInstance().updateFromMaster();
+        }
+    };
+
+    public void resetUfmTimer(){
+        ufmHandler.removeCallbacks(ufmCallback);
+        ufmHandler.postDelayed(ufmCallback, UPDATE_FROM_MASTER_TIMEOUT);
+    }
+
+    public void stopUfmTimer(){
+        ufmHandler.removeCallbacks(ufmCallback);
     }
 
     @Override
     public void onUserInteraction(){
-        resetDisconnectTimer();
+        resetScreenSaverTimer();
+        resetUfmTimer();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        resetDisconnectTimer();
+        resetScreenSaverTimer();
+        resetUfmTimer();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        CommandExecutor.getInstance().updateFromMaster();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        stopDisconnectTimer();
+        stopScreenSaverTimer();
+        stopUfmTimer();
     }
-
 }

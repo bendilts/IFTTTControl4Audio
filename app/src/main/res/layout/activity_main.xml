@@ -7,11 +7,54 @@
     android:background="@color/colorPrimaryDark"
     tools:context="com.bendilts.iftttcontrol4audiobridge.MainActivity">
 
-    <GridView
-        android:id="@+id/mainInputGrid"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:numColumns="3">
-    </GridView>
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="0.92"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <GridView
+                android:id="@+id/mainInputGrid"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:numColumns="3">
+            </GridView>
+
+            <Spinner
+                android:id="@+id/outputSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimaryDark"
+                android:gravity="left"
+                ></Spinner>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_height="match_parent"
+            android:layout_weight=".08"
+            android:layout_width="0dp"
+            android:orientation="vertical"
+        >
+            <com.bendilts.iftttcontrol4audiobridge.VerticalSeekBar
+                android:id="@+id/outputVolume"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_margin="8dp"
+                android:thumbOffset="-0dp"
+                android:thumb="@drawable/thumb_image"/>
+            <ImageView
+                android:id="@+id/inputIcon2"
+                android:layout_width="70dp"
+                android:layout_height="70dp" />
+        </LinearLayout>
+
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

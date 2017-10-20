@@ -45,7 +45,7 @@ public class RadioInput extends AudioInput {
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        AudioSystem.instance.radio.tune(tunerIndex, Control4Radio.stations[position]);
+                        CommandExecutor.getInstance().tune(tunerIndex, Control4Radio.stations[position]);
                     }
                 });
                 return button;
