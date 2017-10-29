@@ -18,7 +18,7 @@ public class AudioInput {
         iconResource = res;
     }
 
-    public View getInputControls(LayoutInflater inflater) {
+    public View getInputControls(LayoutInflater inflater, int textSize) {
         return null;
     }
 }

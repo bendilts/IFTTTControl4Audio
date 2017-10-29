@@ -14,7 +14,7 @@ public class RadioInput extends AudioInput {
         tunerIndex = _tunerIndex;
     }
 
-    public View getInputControls(final LayoutInflater inflater) {
+    public View getInputControls(final LayoutInflater inflater, final int textSize) {
         View view = inflater.inflate(R.layout.radio_controls, null);
 
         GridView stationGrid = (GridView)view.findViewById(R.id.stationGrid);
@@ -40,7 +40,7 @@ public class RadioInput extends AudioInput {
             public View getView(final int position, View convertView, ViewGroup parent) {
                 Button button = new Button(inflater.getContext());
                 button.setText(Control4Radio.stations[position]);
-                button.setTextSize(22);
+                button.setTextSize(textSize);
 
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override

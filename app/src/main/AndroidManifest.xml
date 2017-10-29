@@ -35,11 +35,19 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.bendilts.iftttcontrol4audiobridge.MainActivity" />
         </activity>
-        <activity android:name=".ScreenSaverActivity"
+        <activity
+            android:name=".ScreenSaverActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-        ></activity>
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity android:name=".PhoneActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".PhoneInputActivity"></activity>
     </application>
 
 </manifest>

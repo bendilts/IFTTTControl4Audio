@@ -53,63 +53,7 @@ public class MainActivity extends ScreenSaverableActivity implements Control4Dev
         system.receiver.listeners.add(this);
 
         mainGrid = (GridView)findViewById(R.id.mainInputGrid);
-        mainGridAdapter = new BaseAdapter() {
-
-            @Override
-            public int getCount() {
-                return system.receiver.inputs.size();
-            }
-
-            @Override
-            public Object getItem(int position) {
-                return system.receiver.inputs.get(position);
-            }
-
-            @Override
-            public long getItemId(int position) {
-                return position;
-            }
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View rowView;
-
-                rowView = getLayoutInflater().inflate(R.layout.input_main, null);
-
-                TextView name = (TextView)rowView.findViewById(R.id.inputName);
-                ImageView img = (ImageView)rowView.findViewById(R.id.inputIcon);
-
-                final AudioInput input = system.receiver.inputs.get(position);
-
-                if(system.receiver.inputUsers(input).isEmpty()) {
-                    ColorMatrix matrix = new ColorMatrix();
-                    matrix.setSaturation(0);  //0 means grayscale
-                    ColorMatrixColorFilter cf = new ColorMatrixColorFilter(matrix);
-                    img.setColorFilter(cf);
-                    img.setImageAlpha(80);   // 128 = 0.5
-                }
-
-                name.setText(input.name);
-                img.setImageResource(input.iconResource);
-
-                rowView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(MainActivity.this, InputActivity.class);
-                        intent.putExtra("INPUT_INDEX", input.index);
-                        startActivity(intent);
-                    }
-                });
-
-                return rowView;
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return system.receiver.inputs.isEmpty();
-            }
-        };
-
+        mainGridAdapter = new MainInputGridAdapter(this, InputActivity.class, false);
         mainGrid.setAdapter(mainGridAdapter);
 
         Spinner outputSpinner = (Spinner)findViewById(R.id.outputSpinner);
