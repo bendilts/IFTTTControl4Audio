@@ -88,6 +88,10 @@ public class InputActivity extends ScreenSaverableActivity implements Control4De
 
                 final AudioOutput output = system.receiver.outputs.get(position);
 
+                if(output == system.getLocalOutput()) {
+                    rowView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                }
+
                 name.setText(output.name);
                 if(output.currentInput == input) {
                     volumeBar.setProgress(output.currentVolume);

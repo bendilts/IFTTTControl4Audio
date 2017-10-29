@@ -1,5 +1,7 @@
 package com.bendilts.iftttcontrol4audiobridge;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import java.io.IOException;
@@ -11,6 +13,14 @@ import java.util.Map;
 
 public class AudioSystem {
     private static AudioSystem instance;
+
+    public static AudioSystem getInstance(Context context) {
+        AudioSystem system = getInstance();
+        SharedPreferences prefs = context.getSharedPreferences("audio", Context.MODE_PRIVATE);
+        system.context = context;
+        system.setLocalOutput(system.receiver.getOutput(prefs.getInt("localOutput", 1)));
+        return system;
+    }
 
     public static AudioSystem getInstance() {
         if(instance == null) {
@@ -25,8 +35,25 @@ public class AudioSystem {
     private List<AudioZone> zones = new ArrayList();
     private Map<String, Integer> volumeNames = new HashMap();
 
+    private AudioOutput localOutput;
+    private Context context = null;
+
+    public AudioOutput getLocalOutput() {
+        return this.localOutput;
+    }
+
+    public void setLocalOutput(AudioOutput output) {
+        this.localOutput = output;
+        if(this.context != null) {
+            SharedPreferences prefs = context.getSharedPreferences("audio", Context.MODE_PRIVATE);
+            prefs.edit().putInt("localOutput", output.index).commit();
+        }
+    }
+
     private AudioSystem() {
         instance = this;
+
+        localOutput = receiver.getOutput(0);
 
         zones.add(new AudioZone("master bed", new AudioOutput[] {
                 this.receiver.getOutput("Master Bedroom"),

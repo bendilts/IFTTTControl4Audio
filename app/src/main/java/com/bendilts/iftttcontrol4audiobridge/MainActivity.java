@@ -37,8 +37,6 @@ public class MainActivity extends ScreenSaverableActivity implements Control4Dev
     GridView mainGrid;
     BaseAdapter mainGridAdapter;
 
-    AudioOutput localOutput;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +44,7 @@ public class MainActivity extends ScreenSaverableActivity implements Control4Dev
 
         setContentView(R.layout.activity_main);
 
-        system = AudioSystem.getInstance();
+        system = AudioSystem.getInstance(this);
 
         if(CommandExecutor.isMaster) {
             server = HTTPServer.getInstance();
@@ -141,12 +139,11 @@ public class MainActivity extends ScreenSaverableActivity implements Control4Dev
             }
         });
 
-        localOutput = system.receiver.getOutput(0);
-        outputSpinner.setSelection(0);
+        outputSpinner.setSelection(system.receiver.outputs.indexOf(system.getLocalOutput()));
         outputSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                localOutput = system.receiver.outputs.get(position);
+                system.setLocalOutput(system.receiver.outputs.get(position));
                 updateControls();
             }
 
@@ -172,8 +169,8 @@ public class MainActivity extends ScreenSaverableActivity implements Control4Dev
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if(localOutput != null && localOutput.currentInput != null) {
-                    CommandExecutor.getInstance().setAudio(localOutput, localOutput.currentInput, targetVolume);
+                if(system.getLocalOutput() != null && system.getLocalOutput().currentInput != null) {
+                    CommandExecutor.getInstance().setAudio(system.getLocalOutput(), system.getLocalOutput().currentInput, targetVolume);
                 }
             }
         });
@@ -196,16 +193,16 @@ public class MainActivity extends ScreenSaverableActivity implements Control4Dev
 
         ImageView icon = (ImageView) findViewById(R.id.inputIcon2);
         VerticalSeekBar volume = (VerticalSeekBar)findViewById(R.id.outputVolume);
-        if(localOutput == null || localOutput.currentInput == null) {
+        if(system.getLocalOutput() == null || system.getLocalOutput().currentInput == null) {
             icon.setImageResource(android.R.color.transparent);
             volume.setVisibility(View.INVISIBLE);
             volume.setProgress(0);
         } else {
-            icon.setImageResource(localOutput.currentInput.iconResource);
+            icon.setImageResource(system.getLocalOutput().currentInput.iconResource);
             volume.setVisibility(View.VISIBLE);
-            volume.setProgress(localOutput.currentVolume);
+            volume.setProgress(system.getLocalOutput().currentVolume);
 
-            if(localOutput.currentVolume == 0) {
+            if(system.getLocalOutput().currentVolume == 0) {
                 ColorMatrix matrix = new ColorMatrix();
                 matrix.setSaturation(0);  //0 means grayscale
                 ColorMatrixColorFilter cf = new ColorMatrixColorFilter(matrix);
