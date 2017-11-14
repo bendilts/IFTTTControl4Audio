@@ -11,7 +11,7 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class PhoneInputActivity extends Activity implements Control4Device.DeviceListener {
+public class PhoneInputActivity extends UpdateFromMasterActivity implements Control4Device.DeviceListener {
 
     CommandExecutor executor = CommandExecutor.getInstance();
     AudioSystem system;

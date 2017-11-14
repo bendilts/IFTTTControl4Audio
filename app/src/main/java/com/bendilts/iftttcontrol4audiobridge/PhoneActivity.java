@@ -18,7 +18,7 @@ import android.widget.ImageView;
 
 import static android.content.ContentValues.TAG;
 
-public class PhoneActivity extends Activity implements Control4Device.DeviceListener {
+public class PhoneActivity extends UpdateFromMasterActivity implements Control4Device.DeviceListener {
 
     AudioSystem system;
     GridView mainGrid;
