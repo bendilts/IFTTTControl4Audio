@@ -105,7 +105,9 @@ public class HTTPServer {
                             }
 
                             for(AudioOutput output : outputs) {
-                                system.receiver.sendChannelVol(output, volume);
+                                if(output.currentVolume > 0) {
+                                    system.receiver.sendChannelVol(output, volume);
+                                }
                             }
                             p = parts.length;
                             break;
