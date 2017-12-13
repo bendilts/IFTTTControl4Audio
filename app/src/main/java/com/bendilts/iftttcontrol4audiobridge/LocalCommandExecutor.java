@@ -16,12 +16,12 @@ public class LocalCommandExecutor extends CommandExecutor {
     public void tune(int tuner, String station) {
         AudioSystem.getInstance().radio.tune(tuner, station);
 
-        OnkyoReceiver r = AudioSystem.getInstance().theaterReceiver;
+        OnkyoReceiver r = AudioSystem.getInstance().basementReceiver;
         AudioInput i = r.getOutput(1).currentInput;
         if(i instanceof RadioInput) {
             RadioInput radio = (RadioInput)i;
             if(radio.tunerIndex == tuner) {
-                AudioSystem.getInstance().theaterReceiver.tune(station);
+                AudioSystem.getInstance().basementReceiver.tune(station);
             }
         }
     }

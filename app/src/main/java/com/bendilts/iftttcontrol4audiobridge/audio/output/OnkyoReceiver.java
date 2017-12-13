@@ -67,7 +67,7 @@ public class OnkyoReceiver extends OutputDevice {
 
     public OnkyoReceiver(String ip) {
         this.ip = ip;
-        outputs.put(1, new AudioOutput(this, 9, "Theater", 0));
+        outputs.put(1, new AudioOutput(this, 9, "Basement", 0));
 
         thread.start();
     }

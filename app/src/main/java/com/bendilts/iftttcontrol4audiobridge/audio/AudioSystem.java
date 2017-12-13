@@ -39,7 +39,7 @@ public class AudioSystem {
     }
 
     private Control4Receiver control4Receiver = new Control4Receiver();
-    public OnkyoReceiver theaterReceiver = new OnkyoReceiver("192.168.1.17");
+    public OnkyoReceiver basementReceiver = new OnkyoReceiver("192.168.1.17");
     public Control4Radio radio = new Control4Radio();
 
     private List<AudioZone> zones = new ArrayList();
@@ -94,9 +94,10 @@ public class AudioSystem {
         instance = this;
 
         outputDevices.add(control4Receiver);
-        outputDevices.add(theaterReceiver);
+        outputDevices.add(basementReceiver);
 
         outputs.addAll(control4Receiver.getOutputs().values());
+        outputs.addAll(basementReceiver.getOutputs().values());
 
         Map<Integer, AudioInput> c4Inputs = new HashMap();
         c4Inputs.put(1, radio1);
@@ -107,11 +108,11 @@ public class AudioSystem {
         c4Inputs.put(6, bluetooth);
         control4Receiver.setInputs(c4Inputs);
 
-        Map<Integer, AudioInput> theaterInputs = new HashMap();
-        theaterInputs.put(1, chromecast);
-        theaterInputs.put(2, radio1);
-        theaterInputs.put(3, radio2);
-        theaterReceiver.setInputs(theaterInputs);
+        Map<Integer, AudioInput> basementInputs = new HashMap();
+        basementInputs.put(1, chromecast);
+        basementInputs.put(2, radio1);
+        basementInputs.put(3, radio2);
+        basementReceiver.setInputs(basementInputs);
 
         localOutput = outputs.get(0);
 
@@ -155,6 +156,14 @@ public class AudioSystem {
                 this.control4Receiver.getOutput("Patio"),
         }));
 
+        zones.add(new AudioZone("basement", new AudioOutput[] {
+                this.basementReceiver.getOutput("Basement"),
+        }));
+
+        zones.add(new AudioZone("downstairs", new AudioOutput[] {
+                this.basementReceiver.getOutput("Basement"),
+        }));
+
         zones.add(new AudioZone("main floor", new AudioOutput[] {
                 this.control4Receiver.getOutput("Master Bathroom"),
                 this.control4Receiver.getOutput("Master Bedroom"),
@@ -170,6 +179,7 @@ public class AudioSystem {
                 this.control4Receiver.getOutput("Office"),
                 this.control4Receiver.getOutput("Kitchen"),
                 this.control4Receiver.getOutput("Library"),
+                this.basementReceiver.getOutput("Basement"),
         }));
 
         zones.add(new AudioZone("inside", new AudioOutput[] {
@@ -179,6 +189,7 @@ public class AudioSystem {
                 this.control4Receiver.getOutput("Office"),
                 this.control4Receiver.getOutput("Kitchen"),
                 this.control4Receiver.getOutput("Library"),
+                this.basementReceiver.getOutput("Basement"),
         }));
 
         zones.add(new AudioZone("in doors", new AudioOutput[] {
@@ -188,6 +199,7 @@ public class AudioSystem {
                 this.control4Receiver.getOutput("Office"),
                 this.control4Receiver.getOutput("Kitchen"),
                 this.control4Receiver.getOutput("Library"),
+                this.basementReceiver.getOutput("Basement"),
         }));
 
         zones.add(new AudioZone("in side", new AudioOutput[] {
@@ -197,6 +209,7 @@ public class AudioSystem {
                 this.control4Receiver.getOutput("Office"),
                 this.control4Receiver.getOutput("Kitchen"),
                 this.control4Receiver.getOutput("Library"),
+                this.basementReceiver.getOutput("Basement"),
         }));
 
         zones.add(new AudioZone("upstairs", new AudioOutput[] {
@@ -217,6 +230,7 @@ public class AudioSystem {
                 this.control4Receiver.getOutput("Library"),
                 this.control4Receiver.getOutput("Deck"),
                 this.control4Receiver.getOutput("Patio"),
+                this.basementReceiver.getOutput("Basement"),
         }));
 
         volumeNames.put("low", 25);
