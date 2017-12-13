@@ -1,4 +1,4 @@
-package com.bendilts.iftttcontrol4audiobridge;
+package com.bendilts.iftttcontrol4audiobridge.audio.input;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,10 +7,14 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 
+import com.bendilts.iftttcontrol4audiobridge.CommandExecutor;
+import com.bendilts.iftttcontrol4audiobridge.audio.control4.Control4Radio;
+import com.bendilts.iftttcontrol4audiobridge.R;
+
 public class RadioInput extends AudioInput {
-    private int tunerIndex;
-    RadioInput(int i, String n, String s, int g, int _tunerIndex) {
-        super(i, n, s, g, R.drawable.radio);
+    public int tunerIndex;
+    public RadioInput(int id, String n, String s, int g, int _tunerIndex) {
+        super(id, n, s, g, R.drawable.radio);
         tunerIndex = _tunerIndex;
     }
 

@@ -1,6 +1,5 @@
 package com.bendilts.iftttcontrol4audiobridge;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,11 +10,20 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class PhoneInputActivity extends UpdateFromMasterActivity implements Control4Device.DeviceListener {
+import com.bendilts.iftttcontrol4audiobridge.audio.AudioSystem;
+import com.bendilts.iftttcontrol4audiobridge.audio.control4.Control4Device;
+import com.bendilts.iftttcontrol4audiobridge.audio.input.AudioInput;
+import com.bendilts.iftttcontrol4audiobridge.audio.output.AudioOutput;
+import com.bendilts.iftttcontrol4audiobridge.audio.output.OutputDevice;
+
+import java.util.List;
+
+public class PhoneInputActivity extends UpdateFromMasterActivity implements OutputDevice.DeviceListener {
 
     CommandExecutor executor = CommandExecutor.getInstance();
     AudioSystem system;
     AudioInput input;
+    List<AudioOutput> outputs;
 
     TextView inputName;
     ImageView inputIcon;
@@ -38,9 +46,10 @@ public class PhoneInputActivity extends UpdateFromMasterActivity implements Cont
             }
         });
 
-        int inputIndex = getIntent().getIntExtra("INPUT_INDEX", 1);
+        int inputId = getIntent().getIntExtra("INPUT_ID", 1);
         system = AudioSystem.getInstance();
-        input = system.receiver.getInput(inputIndex);
+        input = system.inputById(inputId);
+        outputs = input.availableOuputs;
 
         View inputControls = input.getInputControls(getLayoutInflater(), 14);
         if(inputControls != null) {
@@ -53,12 +62,12 @@ public class PhoneInputActivity extends UpdateFromMasterActivity implements Cont
         outputListAdapter = new BaseAdapter() {
             @Override
             public int getCount() {
-                return system.receiver.outputs.size();
+                return outputs.size();
             }
 
             @Override
             public Object getItem(int position) {
-                return system.receiver.outputs.get(position);
+                return outputs.get(position);
             }
 
             @Override
@@ -74,7 +83,7 @@ public class PhoneInputActivity extends UpdateFromMasterActivity implements Cont
                 SeekBar volumeBar = (SeekBar)rowView.findViewById(R.id.outputVolume);
                 ImageView icon = (ImageView)rowView.findViewById(R.id.inputIcon);
 
-                final AudioOutput output = system.receiver.outputs.get(position);
+                final AudioOutput output = outputs.get(position);
 
                 name.setText(output.name);
                 if(output.currentInput == input) {
@@ -115,13 +124,17 @@ public class PhoneInputActivity extends UpdateFromMasterActivity implements Cont
         };
 
         outputList.setAdapter(outputListAdapter);
-        system.receiver.listeners.add(this);
+        for(OutputDevice device : system.outputDevices) {
+            device.listeners.add(this);
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        system.receiver.listeners.remove(this);
+        for(OutputDevice device : system.outputDevices) {
+            device.listeners.remove(this);
+        }
     }
 
     @Override

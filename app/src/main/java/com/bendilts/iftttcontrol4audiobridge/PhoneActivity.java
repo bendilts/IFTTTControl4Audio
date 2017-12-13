@@ -1,24 +1,19 @@
 package com.bendilts.iftttcontrol4audiobridge;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.Surface;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.ImageView;
+
+import com.bendilts.iftttcontrol4audiobridge.audio.AudioSystem;
+import com.bendilts.iftttcontrol4audiobridge.audio.control4.Control4Device;
+import com.bendilts.iftttcontrol4audiobridge.audio.output.OutputDevice;
 
 import static android.content.ContentValues.TAG;
 
-public class PhoneActivity extends UpdateFromMasterActivity implements Control4Device.DeviceListener {
+public class PhoneActivity extends UpdateFromMasterActivity implements OutputDevice.DeviceListener {
 
     AudioSystem system;
     GridView mainGrid;
@@ -30,7 +25,9 @@ public class PhoneActivity extends UpdateFromMasterActivity implements Control4D
         setContentView(R.layout.activity_phone);
 
         system = AudioSystem.getInstance(this);
-        system.receiver.listeners.add(this);
+        for(OutputDevice device : system.outputDevices) {
+            device.listeners.add(this);
+        }
 
         mainGrid = (GridView)findViewById(R.id.mainInputGrid);
         mainGridAdapter = new MainInputGridAdapter(this, PhoneInputActivity.class, true);
@@ -46,7 +43,9 @@ public class PhoneActivity extends UpdateFromMasterActivity implements Control4D
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        system.receiver.listeners.remove(this);
+        for(OutputDevice device : system.outputDevices) {
+            device.listeners.remove(this);
+        }
     }
 
     private void updateControls() {

@@ -1,5 +1,8 @@
 package com.bendilts.iftttcontrol4audiobridge;
 
+import com.bendilts.iftttcontrol4audiobridge.audio.input.AudioInput;
+import com.bendilts.iftttcontrol4audiobridge.audio.output.AudioOutput;
+
 public abstract class CommandExecutor {
     static final String masterIP = "192.168.1.34";
     static final String myIP = NetUtils.getIPAddress(true);

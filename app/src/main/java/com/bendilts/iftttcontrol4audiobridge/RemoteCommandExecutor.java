@@ -3,8 +3,11 @@ package com.bendilts.iftttcontrol4audiobridge;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.bendilts.iftttcontrol4audiobridge.audio.AudioSystem;
+import com.bendilts.iftttcontrol4audiobridge.audio.input.AudioInput;
+import com.bendilts.iftttcontrol4audiobridge.audio.output.AudioOutput;
+
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -63,17 +66,16 @@ public class RemoteCommandExecutor extends CommandExecutor {
 
     @Override
     public void setAudio(AudioOutput output, AudioInput input, int volume) {
-        post(String.format("a %d %d %d", output.index, input.index, volume));
+        post(String.format("a %d %d %d", output.id, input.id, volume));
         output.currentInput = input;
         output.currentVolume = volume;
-        AudioSystem.getInstance().receiver.notifyListeners();
+        output.device.notifyListeners();
     }
 
     @Override
     public void tune(int tuner, String station) {
         post(String.format("t %d %s", tuner, station));
         AudioSystem.getInstance().radio.currentStations.put(tuner, station);
-        AudioSystem.getInstance().radio.notifyListeners();
     }
 
     @Override

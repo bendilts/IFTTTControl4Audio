@@ -1,12 +1,14 @@
-package com.bendilts.iftttcontrol4audiobridge;
+package com.bendilts.iftttcontrol4audiobridge.audio;
 
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.bendilts.iftttcontrol4audiobridge.audio.input.AudioInput;
+import com.bendilts.iftttcontrol4audiobridge.audio.output.AudioOutput;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -50,6 +52,8 @@ public class HTTPServer {
 
         private void handleCommand(String body) {
             String info;
+            AudioOutput output;
+            AudioInput input;
 
             try {
                 String[] parts = body.split(" ");
@@ -58,11 +62,9 @@ public class HTTPServer {
                     String command = parts[p++];
                     switch (command) {
                         case "a":
-                            system.receiver.setAudio(
-                                    system.receiver.getOutput(Integer.parseInt(parts[p])),
-                                    system.receiver.getInput(Integer.parseInt(parts[p + 1])),
-                                    Integer.parseInt(parts[p + 2])
-                            );
+                            output = system.outputById(Integer.parseInt(parts[p]));
+                            input = system.inputById(Integer.parseInt(parts[p + 1]));
+                            output.device.setAudio(output, input, Integer.parseInt(parts[p + 2]));
                             p += 3;
                             break;
                         case "t":
@@ -73,16 +75,14 @@ public class HTTPServer {
                             p += 2;
                             break;
                         case "m":
-                            system.receiver.setAudio(
-                                    system.receiver.getOutput(Integer.parseInt(parts[p])),
-                                    null,
-                                    0
-                            );
+                            output = system.outputById(Integer.parseInt(parts[p]));
+                            output.device.setAudio(output, null, 0);
                             p += 1;
                             break;
                         case "l":
+                            input = system.inputById(Integer.parseInt(parts[p]));
                             system.listen(
-                                    system.receiver.getInput(Integer.parseInt(parts[p])),
+                                    input,
                                     TextUtils.join(" ", Arrays.copyOfRange(parts, p + 1, parts.length))
                             );
                             p = parts.length;
@@ -101,20 +101,20 @@ public class HTTPServer {
 
                             List<AudioOutput> outputs = system.outputsFromInfo(info);
                             if(outputs.isEmpty()) {
-                                outputs = system.receiver.outputs;
+                                outputs = system.outputs;
                             }
 
-                            for(AudioOutput output : outputs) {
-                                if(output.currentVolume > 0) {
-                                    system.receiver.sendChannelVol(output, volume);
+                            for(AudioOutput output2 : outputs) {
+                                if(output2.currentVolume > 0) {
+                                    output2.device.sendChannelVol(output2, volume);
                                 }
                             }
                             p = parts.length;
                             break;
                         case "k":
                             info = TextUtils.join(" ", Arrays.copyOfRange(parts, p, parts.length));
-                            for(AudioOutput output : system.outputsFromInfo(info)) {
-                                system.receiver.setAudio(output, null, 0);
+                            for(AudioOutput output2 : system.outputsFromInfo(info)) {
+                                output2.device.setAudio(output2, null, 0);
                             }
                             p = parts.length;
                             break;

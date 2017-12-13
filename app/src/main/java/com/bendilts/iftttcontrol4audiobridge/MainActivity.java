@@ -1,35 +1,26 @@
 package com.bendilts.iftttcontrol4audiobridge;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.database.DataSetObserver;
-import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import com.bendilts.iftttcontrol4audiobridge.audio.AudioSystem;
+import com.bendilts.iftttcontrol4audiobridge.audio.HTTPServer;
+import com.bendilts.iftttcontrol4audiobridge.audio.control4.Control4Device;
+import com.bendilts.iftttcontrol4audiobridge.audio.control4.Control4Radio;
+import com.bendilts.iftttcontrol4audiobridge.audio.output.OutputDevice;
 
-import static android.view.View.INVISIBLE;
-
-public class MainActivity extends ScreenSaverableActivity implements Control4Device.DeviceListener {
+public class MainActivity extends ScreenSaverableActivity implements OutputDevice.DeviceListener {
 
     HTTPServer server;
     AudioSystem system;
@@ -50,7 +41,9 @@ public class MainActivity extends ScreenSaverableActivity implements Control4Dev
             server = HTTPServer.getInstance();
         }
 
-        system.receiver.listeners.add(this);
+        for(OutputDevice device : system.outputDevices) {
+            device.listeners.add(this);
+        }
 
         mainGrid = (GridView)findViewById(R.id.mainInputGrid);
         mainGridAdapter = new MainInputGridAdapter(this, InputActivity.class, false);
@@ -60,12 +53,12 @@ public class MainActivity extends ScreenSaverableActivity implements Control4Dev
         outputSpinner.setAdapter(new BaseAdapter() {
             @Override
             public int getCount() {
-                return system.receiver.outputs.size();
+                return system.outputs.size();
             }
 
             @Override
             public Object getItem(int position) {
-                return system.receiver.outputs.get(position).name;
+                return system.outputs.get(position).name;
             }
 
             @Override
@@ -76,18 +69,18 @@ public class MainActivity extends ScreenSaverableActivity implements Control4Dev
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 TextView tv = new TextView(MainActivity.this);
-                tv.setText(system.receiver.outputs.get(position).name);
+                tv.setText(system.outputs.get(position).name);
                 tv.setTextSize(25);
                 tv.setPadding(5,5,5,5);
                 return tv;
             }
         });
 
-        outputSpinner.setSelection(system.receiver.outputs.indexOf(system.getLocalOutput()));
+        outputSpinner.setSelection(system.outputs.indexOf(system.getLocalOutput()));
         outputSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                system.setLocalOutput(system.receiver.outputs.get(position));
+                system.setLocalOutput(system.outputs.get(position));
                 updateControls();
             }
 
@@ -129,7 +122,9 @@ public class MainActivity extends ScreenSaverableActivity implements Control4Dev
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        system.receiver.listeners.remove(this);
+        for(OutputDevice device : system.outputDevices) {
+            device.listeners.remove(this);
+        }
     }
 
     private void updateControls() {

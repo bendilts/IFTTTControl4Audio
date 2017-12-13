@@ -1,7 +1,10 @@
-package com.bendilts.iftttcontrol4audiobridge;
+package com.bendilts.iftttcontrol4audiobridge.audio.control4;
 
-import java.io.IOException;
+import com.bendilts.iftttcontrol4audiobridge.audio.control4.Control4Device;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Control4Radio extends Control4Device {

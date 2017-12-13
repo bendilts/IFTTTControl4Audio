@@ -1,4 +1,4 @@
-package com.bendilts.iftttcontrol4audiobridge;
+package com.bendilts.iftttcontrol4audiobridge.audio.control4;
 
 import android.util.Log;
 
@@ -9,23 +9,12 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Control4Device {
+public class Control4Device {
     private final String ip;
 
     public Control4Device(String _ip) {
         ip = _ip;
         thread.start();
-    }
-
-    public interface DeviceListener {
-        void onDeviceChange();
-    }
-
-    public List<DeviceListener> listeners = new ArrayList();
-    protected void notifyListeners() {
-        for(DeviceListener l : listeners) {
-            l.onDeviceChange();
-        }
     }
 
     //We can send one message each 100ms. Doing this in this separate thread guarantees we don't
@@ -77,7 +66,7 @@ public abstract class Control4Device {
 
     private DeviceThread thread = new DeviceThread();
 
-    protected void sendToDevice(String cmd) {
+    public void sendToDevice(String cmd) {
         thread.queueCommand(cmd);
     }
 }

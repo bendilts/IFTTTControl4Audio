@@ -1,19 +1,9 @@
 package com.bendilts.iftttcontrol4audiobridge;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.os.AsyncTask;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.MenuItem;
-import android.support.v4.app.NavUtils;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -21,11 +11,20 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class InputActivity extends ScreenSaverableActivity implements Control4Device.DeviceListener {
+import com.bendilts.iftttcontrol4audiobridge.audio.AudioSystem;
+import com.bendilts.iftttcontrol4audiobridge.audio.control4.Control4Device;
+import com.bendilts.iftttcontrol4audiobridge.audio.input.AudioInput;
+import com.bendilts.iftttcontrol4audiobridge.audio.output.AudioOutput;
+import com.bendilts.iftttcontrol4audiobridge.audio.output.OutputDevice;
+
+import java.util.List;
+
+public class InputActivity extends ScreenSaverableActivity implements OutputDevice.DeviceListener {
 
     CommandExecutor executor = CommandExecutor.getInstance();
     AudioSystem system;
     AudioInput input;
+    List<AudioOutput> outputs;
 
     TextView inputName;
     ImageView inputIcon;
@@ -50,9 +49,10 @@ public class InputActivity extends ScreenSaverableActivity implements Control4De
             }
         });
 
-        int inputIndex = getIntent().getIntExtra("INPUT_INDEX", 1);
+        int inputId = getIntent().getIntExtra("INPUT_ID", 1);
         system = AudioSystem.getInstance();
-        input = system.receiver.getInput(inputIndex);
+        input = system.inputById(inputId);
+        outputs = input.availableOuputs;
 
         View inputControls = input.getInputControls(getLayoutInflater(), 22);
         if(inputControls != null) {
@@ -65,12 +65,12 @@ public class InputActivity extends ScreenSaverableActivity implements Control4De
         outputListAdapter = new BaseAdapter() {
             @Override
             public int getCount() {
-                return system.receiver.outputs.size();
+                return outputs.size();
             }
 
             @Override
             public Object getItem(int position) {
-                return system.receiver.outputs.get(position);
+                return outputs.get(position);
             }
 
             @Override
@@ -86,7 +86,7 @@ public class InputActivity extends ScreenSaverableActivity implements Control4De
                 SeekBar volumeBar = (SeekBar)rowView.findViewById(R.id.outputVolume);
                 ImageView icon = (ImageView)rowView.findViewById(R.id.inputIcon);
 
-                final AudioOutput output = system.receiver.outputs.get(position);
+                final AudioOutput output = outputs.get(position);
 
                 if(output == system.getLocalOutput()) {
                     rowView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
@@ -131,14 +131,17 @@ public class InputActivity extends ScreenSaverableActivity implements Control4De
         };
 
         outputList.setAdapter(outputListAdapter);
-        system.receiver.listeners.add(this);
-
+        for(OutputDevice device : system.outputDevices) {
+            device.listeners.add(this);
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        system.receiver.listeners.remove(this);
+        for(OutputDevice device : system.outputDevices) {
+            device.listeners.remove(this);
+        }
     }
 
     @Override

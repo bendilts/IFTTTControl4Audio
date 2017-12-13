@@ -14,6 +14,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bendilts.iftttcontrol4audiobridge.audio.AudioSystem;
+import com.bendilts.iftttcontrol4audiobridge.audio.input.AudioInput;
+
 public class MainInputGridAdapter extends BaseAdapter {
     private AudioSystem system = AudioSystem.getInstance();
     private Activity activity;
@@ -29,12 +32,12 @@ public class MainInputGridAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return system.receiver.inputs.size();
+        return system.inputs.length;
     }
 
     @Override
     public Object getItem(int position) {
-        return system.receiver.inputs.get(position);
+        return system.inputs[position];
     }
 
     @Override
@@ -51,9 +54,9 @@ public class MainInputGridAdapter extends BaseAdapter {
         TextView name = (TextView)rowView.findViewById(R.id.inputName);
         ImageView img = (ImageView)rowView.findViewById(R.id.inputIcon);
 
-        final AudioInput input = system.receiver.inputs.get(position);
+        final AudioInput input = system.inputs[position];
 
-        if(system.receiver.inputUsers(input).isEmpty()) {
+        if(system.inputUsers(input).isEmpty()) {
             ColorMatrix matrix = new ColorMatrix();
             matrix.setSaturation(0);  //0 means grayscale
             ColorMatrixColorFilter cf = new ColorMatrixColorFilter(matrix);
@@ -80,7 +83,7 @@ public class MainInputGridAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity, inputActivityClass);
-                intent.putExtra("INPUT_INDEX", input.index);
+                intent.putExtra("INPUT_ID", input.id);
                 activity.startActivity(intent);
             }
         });
@@ -90,6 +93,6 @@ public class MainInputGridAdapter extends BaseAdapter {
 
     @Override
     public boolean isEmpty() {
-        return system.receiver.inputs.isEmpty();
+        return system.inputs.length == 0;
     }
 }
