@@ -319,11 +319,11 @@ public class AudioSystem {
             String command = parts[p++];
             switch (command) {
                 case "a":
-                    AudioOutput output = control4Receiver.getOutput(Integer.parseInt(parts[p]));
-                    AudioInput input = control4Receiver.getInput(Integer.parseInt(parts[p + 1]));
+                    AudioOutput output = outputById(Integer.parseInt(parts[p]));
+                    AudioInput input = inputById(Integer.parseInt(parts[p + 1]));
                     output.currentInput = input;
                     output.currentVolume = Integer.parseInt(parts[p + 2]);
-                    control4Receiver.notifyListeners();
+                    output.device.notifyListeners();
                     p += 3;
                     break;
                 case "t":
